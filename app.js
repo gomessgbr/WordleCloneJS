@@ -83,16 +83,19 @@ keys.forEach((key) => {
 });
 
 const handleClick = (letter) => {
-  console.log("clicked", letter);
-  if (letter === "<<") {
-    deleteLetter();
-    return;
+  if (!isGameOver) {
+    console.log("clicked", letter);
+    if (letter === "<<") {
+      deleteLetter();
+      return;
+    }
+    if (letter === "ENTER") {
+      checkRow();
+      console.log("Check row");
+    }
+    addLetter(letter);
+    console.log("guessRows", guessRows);
   }
-  if (letter === "ENTER") {
-    checkRow();
-    console.log("Check row");
-  }
-  addLetter(letter);
 };
 
 const addLetter = (letter) => {
@@ -131,25 +134,32 @@ const checkRow = () => {
       .then((response) => response.json())
       .then((json) => {
         console.log(json);
-      });
+        if (json === "Entry word not found") {
+          showMessage("word not in list");
+          return;
+        } else {
+          console.log("guess is " + guess, "wordle is " + wordle);
 
-    console.log("guess is " + guess, "wordle is " + wordle);
-    flipTile();
-    if (wordle === guess) {
-      showMessage("Magnificent!");
-      isGameOver = true;
-      return;
-    } else {
-      if (currentRow >= 5) {
-        isGameOver = false;
-        showMessage("Game Over");
-        return;
-      }
-      if (currentRow < 5) {
-        currentRow++;
-        currentTile = 0;
-      }
-    }
+          flipTile();
+
+          if (wordle === guess) {
+            showMessage("Magnificent!");
+            isGameOver = true;
+            return;
+          } else {
+            if (currentRow >= 5) {
+              isGameOver = true;
+              showMessage("Game Over");
+              return;
+            }
+            if (currentRow < 5) {
+              currentRow++;
+              currentTile = 0;
+            }
+          }
+        }
+      })
+      .catch((err) => console.log(err));
   }
 };
 
