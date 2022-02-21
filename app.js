@@ -1,7 +1,20 @@
 const tileDisplay = document.querySelector(".tile-container");
 const keyboard = document.querySelector(".key-container");
 const messageDisplay = document.querySelector(".message-container");
-const wordle = "SUPER";
+
+let wordle;
+const getWordle = () => {
+  fetch("http://localhost:8000/word")
+    .then((response) => response.json())
+    .then((json) => {
+      console.log(json);
+      wordle = json.toUpperCase();
+    })
+    .catch((err) => console.log(err));
+};
+
+getWordle();
+
 const keys = [
   "Q",
   "W",
@@ -111,8 +124,16 @@ const deleteLetter = () => {
 const checkRow = () => {
   const guess = guessRows[currentRow].join("");
 
+  console.log("guess", guess);
+
   if (currentTile > 4) {
-    console.log("guess is" + guess, "wordle is" + wordle);
+    fetch(`http://localhost:8000/check/?word=${guess}`)
+      .then((response) => response.json())
+      .then((json) => {
+        console.log(json);
+      });
+
+    console.log("guess is " + guess, "wordle is " + wordle);
     flipTile();
     if (wordle === guess) {
       showMessage("Magnificent!");
